@@ -13,9 +13,9 @@ async function seed() {
     console.log('sedding dimulai....')
 
     // 1 buat admin 
-const hash = await bcrypt.hash('admin', 10);
+const hash = await bcrypt.hash('123456', 10);
 await db.insert(userss).values({
-    username: 'admin',
+    username: 'admin123',
     password: hash,
     role: 'admin',
 }).onConflictDoNothing();
