@@ -8,6 +8,7 @@ import { eq, desc } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { createClient } from '@supabase/supabase-js';
+import { serveStatic } from '@hono/node-server/serve-static';
 
 // 1. Load env
 process.loadEnvFile();
@@ -172,6 +173,7 @@ app.post('/api/orders', async (c) => {
         return c.json({ success: false, message: e.message }, 400);
     }
 });
+app.use('/*', serveStatic({ path: './public' }));
 
 const port = 6969;
 console.log(`server running at http://localhost:${port}`);

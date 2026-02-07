@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toko Warga</title>
+</head>
+<body>
+    <h1>Toko Warga</h1>
+
+    <button onclick="ToggleCart()">
+        Lihat keranjang (<span id="count">0</span>)
+    </button>
+
+    <hr>
+
+    <div id="cartmodel" style="display: none; background: #eee; padding: 20px; border: 1px solid #ccc; margin-bottom: 20px">
+        <h2>Keranjang anda</h2>
+        <div id="charlist"></div>
+        <br>
+
+        <label>Nama pesanan: </label><br>
+        <input type="text" id="cName"><br><br>
+
+        <label>Alamat pengiriman</label><br>
+        <input type="text" id="cAddr"><br><br>
+
+        <button onclick="checkout()">Beli via WhatsApp</button>
+        <button onclick="ToggleCart()">Tutup</button>
+    </div>
+
+    <div id="products"></div>
+
+    <script>
+        let cart = [];
+        let allproduct = []
+
+        async function load() {
+            const res = await fetch('/api/product');
+            const json = await res.json();
+            allproduct = json.data
+
+            document.getElementById('products').innerHTML = allproduct.map(p => `
+            <div style="border: 1px solid #ccc; padding:  10px; margin-bottom: 10px;">
+                <img src="${p.imageUrl}" width:="150" alt="${p.name}"><br>
+                <h3>${p.name}</h3>
+                <p>Harga: Rp ${parseInt(p.price).toLocaleString()}</p>
+            <button onclick="add(${p.id})">Tambah ke keranjang</button>(+)</button>
+            </div>
+            `).join('')
+
+        }
+
+        function add(id) {
+            const exist = cart.find(c => c.produtId == id);
+                 if (exist) exist.quantity++; 
+                 else cart.push({ productId: id, quantity: 1 });
+                 uppdateCunt();
+        }
+
+        function uppdateCunt() {
+            document.getElementById('count').innerText = cart.reduce((a,b) =>a+b.quantity, 0);
+        }
+
+        function ToggleCart(){
+            const m = document.getElementById('cartModal');
+
+            if (m.style.display === 'none'){
+                m.style.display === 'block'
+                renderCartList();
+            } else {
+                m.style.display = 'none';
+            }
+        }
+
+        function renderCartList() {
+            document.getElementById('cartList').innerHTML = cart.map(c => {
+                const p = allproduct.find(p => p.id == c.productId);
+
+                return
+                `<div>
+                    ${p.name} (x${c.quantity}) - Rp ${parseInt(p.price*c.quantity).toLocaleString()}
+                    <
+                </div>`
+            }).join('')
+        }   
+
+        async function checkout() {
+            const name = document.getElementById('cName').value;
+            const addr = document.getElementById('cAddr').value;
+            if(!name || !addr || !cart.length===0) return alert('data belum lengkap');
+
+            const data = await res.json();
+
+            if(data.success) {
+                const msg = `Halo Admin, Order ID #${data.orderId}. Total: Rp ${data.total.toLocaleString()}. Dikirim ke: ${addr}`;
+
+                window.lolation.herf = `https://wa.me/62123456789?text=${encodeURIComponent(msg)}`
+            }
+        }
+
+        load();
+    </script>
+</body>
+</html>
