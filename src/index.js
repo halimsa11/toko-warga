@@ -147,7 +147,7 @@ app.post('/api/orders', async (c) => {
         return c.json({ success: false, message: e.message }, 400);
     }
 });
-app.use('/*', serveStatic({ path: './public' }));
+app.use('/*', serveStatic({ root: './public' }));
 
 const port = 6969;
 console.log(`Server running at http://localhost:${port}`);
